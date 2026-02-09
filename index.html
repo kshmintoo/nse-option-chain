@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>NSE Option Chain Live</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body { font-family: Arial; background:#0f172a; color:white; }
+    table { width:100%; border-collapse:collapse; font-size:12px; }
+    th, td { border:1px solid #334155; padding:4px; text-align:center; }
+    th { background:#1e293b; }
+    h2 { text-align:center; }
+  </style>
+</head>
+<body>
+
+<h2>📊 Live NSE Option Chain</h2>
+
+<select id="symbol" onchange="loadData()">
+  <option value="NIFTY">NIFTY</option>
+  <option value="BANKNIFTY">BANKNIFTY</option>
+</select>
+
+<table id="tbl">
+  <thead>
+    <tr>
+      <th>Strike</th>
+      <th>CE OI</th>
+      <th>CE LTP</th>
+      <th>PE LTP</th>
+      <th>PE OI</th>
+    </tr>
+  </thead>
+  <tbody></tbody>
+</table>
+
+<script>
+async function loadData() {
+  let sym = document.getElementById("symbol").value;
+  let res = await fetch(`https://YOUR-VERCEL-URL.vercel.app/api/optionchain?symbol=${sym}`);
+  let data = await res.json();
+
+  let tbody = document.querySelector("#tbl tbody");
+  tbody.innerHTML = "";
+
+  data.records.data.forEach(d => {
+    if(d.CE && d.PE){
+      tbody.innerHTML += `
+        <tr>
+          <td>${d.strikePrice}</td>
+          <td>${d.CE.openInterest}</td>
+          <td>${d.CE.lastPrice}</td>
+          <td>${d.PE.lastPrice}</td>
+          <td>${d.PE.openInterest}</td>
+        </tr>`;
+    }
+  });
+}
+loadData();
+setInterval(loadData, 10000);
+</script>
+
+</body>
+</html>
